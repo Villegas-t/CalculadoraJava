@@ -31,7 +31,9 @@ public abstract class Operacao {
 	}
 	public Double calcular() {
 		this.validar();
-		return executarCalculo();
+		double resultado = executarCalculo();
+		operandos.clear();
+		return resultado;
 	}
 	public String saidaCalculo() {
 		String aux= "";

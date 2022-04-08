@@ -19,12 +19,19 @@ import java.awt.GridLayout;
 import java.awt.GridBagLayout;
 import javax.swing.JButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
+
+import Controle.Calculadora;
+import Modelo.Operacao;
+
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
 
 public class Tela extends JFrame {
-	
+	int operacaoAtual = -1;
+	ArrayList<Double> guardaOperandos = new ArrayList<>();
+
 	
 
 	public static void main(String[] args) {
@@ -44,6 +51,10 @@ public class Tela extends JFrame {
 		
 	}
 	public Tela() {
+		Calculadora c= new Calculadora();
+		ArrayList<Operacao> listaOperacoes = c.listaDeOperacoes();
+
+
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setBackground(new Color(51, 51, 51));
 		this.setSize(new Dimension(334, 510));
@@ -251,6 +262,8 @@ public class Tela extends JFrame {
 		btn_raiz.setBackground(Color.DARK_GRAY);
 		getContentPane().add(btn_raiz, "cell 0 3");
 		
+
+
 		btnBotao_0.addActionListener(new ActionListener() {
 			
 			
@@ -336,7 +349,7 @@ public class Tela extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(!textField.getText().isEmpty()){
+				if(verificarVazio()){
 					if(textField.getText().contains(".")){
 							JOptionPane.showMessageDialog(null, "Já existe um ponto no número inserido!");
 					}else{
@@ -358,14 +371,14 @@ public class Tela extends JFrame {
 			
 			
 			public void actionPerformed(ActionEvent e) {
-							
+				tratarOperacao("+", listaOperacoes);
 			}
 		});
 		btn_sub.addActionListener(new ActionListener() {
 			
 			
 			public void actionPerformed(ActionEvent e) {
-				
+				tratarOperacao("-", listaOperacoes);
 				
 			}
 		});
@@ -373,7 +386,7 @@ public class Tela extends JFrame {
 			
 	
 			public void actionPerformed(ActionEvent e) {
-				
+				tratarOperacao("x", listaOperacoes);
 				
 			}
 		});
@@ -381,7 +394,7 @@ public class Tela extends JFrame {
 			
 			
 			public void actionPerformed(ActionEvent e) {
-			
+				tratarOperacao("/", listaOperacoes);
 				
 			}
 		});
@@ -389,7 +402,7 @@ public class Tela extends JFrame {
 			
 			
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
+				tratarOperacao("R", listaOperacoes);
 				
 			}
 		});
@@ -397,7 +410,7 @@ public class Tela extends JFrame {
 			
 			
 			public void actionPerformed(ActionEvent e) {
-				
+				tratarIgual(listaOperacoes);
 			}
 		});
 
@@ -411,6 +424,54 @@ public class Tela extends JFrame {
 	}
 	public void limpaPainel() {
 		this.textField.setText("");
+	}
+	public boolean verificarVazio(){
+		if(textField.getText().isEmpty()){
+			return false;
+		}else{
+			return true;
+		}
+	}
+	public void tratarOperacao(String sinal, ArrayList<Operacao> listaOperacoes){
+		Calculadora c = new Calculadora();
+		
+		if(c.verificarOperacao(sinal)){
+			operacaoAtual = c.operacaoAtual(sinal);
+			if(verificarVazio()){
+				double valor = Double.parseDouble(textField.getText());
+				guardaOperandos.add(valor);
+				limpaPainel();
+				if(listaOperacoes.get(operacaoAtual).getNumeroOperandos() < 2){
+					listaOperacoes.get(operacaoAtual).addOperando(guardaOperandos.get(0));
+					double resultado = listaOperacoes.get(operacaoAtual).calcular();
+					textField.setText(String.valueOf(resultado));
+					guardaOperandos.clear();
+				}
+			}
+		}
+
+	}
+	public void tratarIgual (ArrayList<Operacao> listaOperacoes){
+		if(operacaoAtual != -1){
+			int numeroOperandos = listaOperacoes.get(operacaoAtual).getNumeroOperandos();
+			if(numeroOperandos - 1 == guardaOperandos.size() && numeroOperandos > 1){
+				double valor = Double.parseDouble(textField.getText());
+				guardaOperandos.add(valor);
+				for(int i= 0; i < guardaOperandos.size(); i++){
+					listaOperacoes.get(operacaoAtual).addOperando(guardaOperandos.get(i));
+				}
+				double resultado = listaOperacoes.get(operacaoAtual).calcular();
+				limpaPainel();
+				textField.setText(String.valueOf(resultado));
+				guardaOperandos.clear();
+				operacaoAtual = -1;
+			}else{
+				JOptionPane.showMessageDialog(null, "Ops! algo deu errado, exigido " + numeroOperandos + " operandos para realizar este cálculo");
+				guardaOperandos.clear();
+			}
+		}else{
+			JOptionPane.showMessageDialog(null, "Não escolheu uma operaçao ou o campo está vazio!");
+		}
 	}
 	
 	

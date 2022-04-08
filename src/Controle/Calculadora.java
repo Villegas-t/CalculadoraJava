@@ -31,4 +31,16 @@ public class Calculadora {
 		return operacao;
 	}
 
+		public boolean verificarOperacao(String op){
+	for(int i = 0; i<listaDeOperacoes().size(); i++){
+		if(op.equals(listaDeOperacoes().get(i).getNomeOperacao())){
+			return true;
+		}
+		}return false;
+	}
+        public ArrayList<Operacao> listaOperacoes() {
+            return null;
+        }
 }
+
+
